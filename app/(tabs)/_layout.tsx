@@ -1,43 +1,77 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Tabs } from "expo-router";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { View, Text } from "react-native";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: { backgroundColor: "#ffffff", height: 55 },
+        tabBarIcon: ({ focused }) => {
+          let iconName:
+            | "home"
+            | "account-outline"
+            | "chat-outline"
+            | "calendar-month-outline" = "home";
+
+          if (route.name === "home") {
+            iconName = "home";
+          } else if (route.name === "calender") {
+            iconName = "calendar-month-outline";
+          } else if (route.name === "chat") {
+            iconName = "chat-outline";
+          } else if (route.name === "profile") {
+            iconName = "account-outline";
+          }
+
+          return (
+            <View style={{ alignItems: "center" }}>
+              <MaterialCommunityIcons
+                name={iconName}
+                size={30}
+                color={`${focused ? "#3787eb" : "#9a9a9a"}`}
+              />
+            </View>
+          );
+        },
+        tabBarShowLabel: false, // Show labels
+        tabBarLabelStyle: { fontSize: 12 }, // Customize label style
+      })}
+    >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>Home</Text>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="calender"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>
+              calender
+            </Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>chats</Text>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>profile</Text>
+          ),
         }}
       />
     </Tabs>
