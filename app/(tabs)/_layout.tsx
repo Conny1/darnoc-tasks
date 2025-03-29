@@ -1,79 +1,80 @@
 import { Tabs } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { View, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarStyle: { backgroundColor: "#ffffff", height: 55 },
-        tabBarIcon: ({ focused }) => {
-          let iconName:
-            | "home"
-            | "account-outline"
-            | "chat-outline"
-            | "calendar-month-outline" = "home";
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <Tabs
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: "#ffffff",
+            height: 75,
 
-          if (route.name === "home") {
-            iconName = "home";
-          } else if (route.name === "calender") {
-            iconName = "calendar-month-outline";
-          } else if (route.name === "chat") {
-            iconName = "chat-outline";
-          } else if (route.name === "profile") {
-            iconName = "account-outline";
-          }
+            paddingTop: 20,
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1,
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOpacity: 0.1,
+            shadowOffset: { width: 0, height: -3 },
+          },
 
-          return (
-            <View style={{ alignItems: "center" }}>
-              <MaterialCommunityIcons
-                name={iconName}
-                size={30}
-                color={`${focused ? "#3787eb" : "#9a9a9a"}`}
-              />
-            </View>
-          );
-        },
-        tabBarShowLabel: false, // Show labels
-        tabBarLabelStyle: { fontSize: 12 }, // Customize label style
-      })}
-    >
-      <Tabs.Screen
-        name="home"
-        options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>Home</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="calender"
-        options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>
-              calender
-            </Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="chat"
-        options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>chats</Text>
-          ),
-        }}
-      />
+          tabBarIcon: ({ focused }) => {
+            let iconName:
+              | "home"
+              | "account-outline"
+              | "chat-outline"
+              | "calendar-month-outline" = "home";
 
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ color: focused ? "#fff" : "#75c8d6" }}>profile</Text>
-          ),
-        }}
-      />
-    </Tabs>
+            if (route.name === "home") {
+              iconName = "home";
+            } else if (route.name === "calender") {
+              iconName = "calendar-month-outline";
+            } else if (route.name === "chat") {
+              iconName = "chat-outline";
+            } else if (route.name === "profile") {
+              iconName = "account-outline";
+            }
+
+            return (
+              <View style={{ justifyContent: "center", alignItems: "center" }}>
+                <MaterialCommunityIcons
+                  name={iconName}
+                  size={30}
+                  color={focused ? "#3787eb" : "#9a9a9a"}
+                />
+              </View>
+            );
+          },
+          tabBarShowLabel: false,
+        })}
+      >
+        <Tabs.Screen name="home" />
+        <Tabs.Screen name="calender" />
+        <Tabs.Screen name="chat" />
+        <Tabs.Screen name="profile" />
+      </Tabs>
+      <TouchableOpacity style={styles.floatingButton}>
+        <MaterialCommunityIcons name="plus" size={40} color="#ffffff" />
+      </TouchableOpacity>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  floatingButton: {
+    position: "absolute",
+    bottom: 50, // Adjust based on your taskbar height
+    zIndex: 999,
+    alignSelf: "center",
+    backgroundColor: "#3787eb",
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
