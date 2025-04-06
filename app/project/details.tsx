@@ -12,7 +12,10 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { TaskCard } from "@/components";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { taskType } from "@/types";
-import CalendarPicker from "react-native-calendar-picker";
+import { LinearGradient } from "expo-linear-gradient";
+import * as Progress from "react-native-progress";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 
 const tasks: taskType[] = [
   {
@@ -137,37 +140,104 @@ const tasks: taskType[] = [
   },
 ];
 
-const Calender = () => {
+const ProjectDetails = () => {
   const navigation = useNavigation();
-  const router = useRouter();
+  const route = useRouter();
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      title: "Upcoming Tasks",
+      title: "Project Details",
       headerTitleAlign: "center", // Centers the title
       headerTitleStyle: {
         // fontWeight: "bold",
         // fontSize: 25,
         color: "#000022",
       },
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => route.back()}
+          style={{
+            padding: 10,
+            backgroundColor: "#f1f1f1",
+            borderRadius: 10,
+            marginRight: 10,
+          }}
+        >
+          <AntDesign name="left" size={24} color="black" />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 
   return (
     <View style={styles.main}>
-      <View>
-        <CalendarPicker />
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: 600,
+          width: "100%",
+          marginBottom: 20,
+        }}
+      >
+        Web Development
+      </Text>
+      <View style={styles.date_container}>
+        <View style={styles.dateIcon}>
+          <SimpleLineIcons name="calendar" size={20} color="#3787eb" />
+        </View>
+        <Text style={{ color: "#9a9a9a", fontWeight: 600 }}>
+          04 april , at 11:30 AM
+        </Text>
       </View>
-      <View style={styles.tasksHeader}>
-        <Text style={{ fontSize: 20, fontWeight: 600 }}>Schedule</Text>
+      <View style={styles.progressContainer}>
+        <View style={styles.progressInfo}>
+          <Text style={{ fontWeight: 500 }}>In Progress</Text>
+          <Text style={{ fontWeight: 500 }}>40%</Text>
+        </View>
+        <Progress.Bar
+          borderWidth={0}
+          unfilledColor="#ecf4fd"
+          color="#3787eb"
+          height={7}
+          progress={0.3}
+          width={300}
+        />
+      </View>
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: 600,
+          width: "100%",
+          marginBottom: 20,
+        }}
+      >
+        Overview
+      </Text>
 
-        <TouchableOpacity
-          style={styles.addNewBTN}
-          onPress={() => router.push("/task/create")}
-        >
-          <MaterialCommunityIcons name="plus" size={15} color="#ffffff" />
-          <Text style={{ color: "#ffffff", fontWeight: 500 }}>Add new</Text>
+      <Text
+        style={{
+          fontWeight: 600,
+          lineHeight: 20,
+          color: "#9a9a9a",
+          width: "100%",
+          marginBottom: 20,
+          height: "auto",
+        }}
+      >
+        If you liked Tsukimichi: Moonlit Fantasy, you're probably into isekai
+        anime with a powerful MC, fantasy world-building, and some comedy. Heres
+        a list of anime similar in vibe, theme, or tone...
+        <TouchableOpacity>
+          <Text style={{ color: "#3787eb", fontWeight: 600 }}>Read More</Text>
+        </TouchableOpacity>
+      </Text>
+
+      <View style={styles.tasksHeader}>
+        <Text style={{ fontSize: 20, fontWeight: 600 }}> Tasks</Text>
+
+        <TouchableOpacity>
+          <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>See All</Text>
         </TouchableOpacity>
       </View>
 
@@ -184,7 +254,7 @@ const Calender = () => {
   );
 };
 
-export default Calender;
+export default ProjectDetails;
 
 const styles = StyleSheet.create({
   main: {
@@ -193,13 +263,21 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  addNewBTN: {
-    backgroundColor: "#3787eb",
+
+  date_container: {
+    width: "100%",
     flexDirection: "row",
+
     alignItems: "center",
-    justifyContent: "center",
-    padding: 6,
-    borderRadius: 10,
+    gap: 10,
+
+    marginBottom: 10,
+  },
+
+  dateIcon: {
+    backgroundColor: "#ecf4fd",
+    padding: 10,
+    borderRadius: 30,
   },
   tasksHeader: {
     flexDirection: "row",
@@ -209,6 +287,8 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     marginTop: 10,
+    width: "100%",
+    marginBottom: 20,
   },
   progressInfo: {
     flexDirection: "row",

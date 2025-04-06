@@ -4,12 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 
 export default function TabLayout() {
-  const [screen, setscreen] = useState("home");
-  const path = usePathname().split("/")[1];
   const route = useRouter();
-  useEffect(() => {
-    setscreen(path);
-  }, [path]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
@@ -65,14 +60,13 @@ export default function TabLayout() {
         <Tabs.Screen name="chat" />
         <Tabs.Screen name="profile" />
       </Tabs>
-      {screen === "home" && (
-        <TouchableOpacity
-          onPress={() => route.push("/task/create")}
-          style={styles.floatingButton}
-        >
-          <MaterialCommunityIcons name="plus" size={40} color="#ffffff" />
-        </TouchableOpacity>
-      )}
+
+      <TouchableOpacity
+        onPress={() => route.push("/task/create")}
+        style={styles.floatingButton}
+      >
+        <MaterialCommunityIcons name="plus" size={40} color="#ffffff" />
+      </TouchableOpacity>
     </View>
   );
 }

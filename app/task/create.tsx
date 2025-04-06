@@ -57,7 +57,7 @@ const CreateTask = () => {
       },
       headerLeft: () => (
         <TouchableOpacity
-          onPress={() => route.push("/home")}
+          onPress={() => route.back()}
           style={{
             padding: 10,
             backgroundColor: "#f1f1f1",

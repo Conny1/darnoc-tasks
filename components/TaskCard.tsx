@@ -1,11 +1,13 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import { useRouter } from "expo-router";
 
 type Props = {
   item: { id: number; title: string; start_time: string; end_time: string };
 };
 const TaskCard = ({ item }: Props) => {
+  const route = useRouter();
   return (
     <View style={styles.TaskCard}>
       <View style={styles.TaskCardContent}>
@@ -27,7 +29,7 @@ const TaskCard = ({ item }: Props) => {
         </View>
       </View>
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => route.push("/task/details")}>
         <SimpleLineIcons name="arrow-right" size={24} color="black" />
       </TouchableOpacity>
     </View>
