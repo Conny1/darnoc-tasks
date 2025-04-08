@@ -236,7 +236,7 @@ const ProjectDetails = () => {
       <View style={styles.tasksHeader}>
         <Text style={{ fontSize: 20, fontWeight: 600 }}> Tasks</Text>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => route.push("/task/list")}>
           <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>See All</Text>
         </TouchableOpacity>
       </View>

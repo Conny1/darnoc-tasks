@@ -1,6 +1,4 @@
 import {
-  FlatList,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -64,7 +62,7 @@ const CreateProject = () => {
               marginBottom: 10,
             }}
           >
-            Project Name
+            Project Name <Text style={{ color: "red" }}>*</Text>
           </Text>
           <TextInput
             onChangeText={(text) => settitle(text)}
@@ -93,7 +91,7 @@ const CreateProject = () => {
               marginBottom: 10,
             }}
           >
-            Date
+            Date <Text style={{ color: "red" }}>*</Text>
           </Text>
           <View style={styles.date_container}>
             <Text>{start_date.toDateString()}</Text>
@@ -111,14 +109,14 @@ const CreateProject = () => {
               marginBottom: 10,
             }}
           >
-            Description
+            Description <Text style={{ color: "red" }}>*</Text>
           </Text>
           <TextInput
             onChangeText={(text) => setdesc(text)}
             style={styles.inputDesc}
             multiline
             numberOfLines={6}
-            placeholder="eg ui design"
+            placeholder="A short description about the project"
           />
         </View>
         <TouchableOpacity onPress={createProject} style={styles.createProject}>

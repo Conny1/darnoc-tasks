@@ -123,7 +123,10 @@ export default function TabLayout() {
         >
           <TouchableOpacity
             style={styles.addNewBTN}
-            onPress={() => route.push("/project/create")}
+            onPress={() => {
+              route.push("/project/create");
+              setbtns(false);
+            }}
           >
             <MaterialCommunityIcons name="plus" size={15} color="#ffffff" />
             <Text style={{ color: "#ffffff", fontWeight: 500 }}>
@@ -133,7 +136,10 @@ export default function TabLayout() {
 
           <TouchableOpacity
             style={styles.addNewBTN}
-            onPress={() => route.push("/task/create")}
+            onPress={() => {
+              route.push("/task/create");
+              setbtns(false);
+            }}
           >
             <MaterialCommunityIcons name="plus" size={15} color="#ffffff" />
             <Text style={{ color: "#ffffff", fontWeight: 500 }}> New Task</Text>

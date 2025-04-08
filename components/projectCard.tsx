@@ -23,13 +23,12 @@ const ProjectCard = ({ item }: Props) => {
         <View style={styles.info}>
           <Text style={{ fontWeight: 400, fontSize: 15 }}>{item.title}</Text>
           <Text style={{ color: "#9a9a9a" }}>
-            {" "}
             {item.start_time} - {item.end_time}
           </Text>
         </View>
       </View>
 
-      <TouchableOpacity onPress={() => route.push("/task/details")}>
+      <TouchableOpacity onPress={() => route.push("/project/[id]")}>
         <SimpleLineIcons name="arrow-right" size={24} color="black" />
       </TouchableOpacity>
     </View>

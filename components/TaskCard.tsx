@@ -29,7 +29,7 @@ const TaskCard = ({ item }: Props) => {
         </View>
       </View>
 
-      <TouchableOpacity onPress={() => route.push("/task/details")}>
+      <TouchableOpacity onPress={() => route.push("/task/[id]")}>
         <SimpleLineIcons name="arrow-right" size={24} color="black" />
       </TouchableOpacity>
     </View>

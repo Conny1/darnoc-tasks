@@ -12,19 +12,29 @@ import React, { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 
-type categoryProps = {
-  category: string;
+type projectProps = {
+  project: { id: string; title: string };
+  setproject: React.Dispatch<React.SetStateAction<string>>;
+  selected: string;
 };
-const Category = ({ category }: categoryProps) => {
+const Project = ({ project, selected, setproject }: projectProps) => {
   const [active, setactive] = useState(false);
+  useEffect(() => {
+    if (active && project.id !== selected) {
+      setactive(!active);
+    }
+  }, [selected]);
+
   return (
     <TouchableOpacity
       onPress={() => {
         setactive((prev) => !prev);
+        setproject(project.id);
       }}
       style={{
-        ...styles.categorybtn,
+        ...styles.projectbtn,
         backgroundColor: active ? "#3787eb" : "#ecf4fd",
       }}
     >
@@ -33,17 +43,32 @@ const Category = ({ category }: categoryProps) => {
           color: !active ? "#00000" : "#ecf4fd",
         }}
       >
-        {category}
+        {project.title}
       </Text>
     </TouchableOpacity>
   );
 };
 
-let categories = ["Design", "development", "research"];
+let projects = [
+  { id: "a", title: "Design" },
+  { id: "b", title: "development" },
+  { id: "c", title: "research" },
+  { id: "d", title: "Science" },
+];
 
 const CreateTask = () => {
   const navigation = useNavigation();
   const route = useRouter();
+  const [select_date, setselect_date] = useState(false);
+  const [start, setstart] = useState(false);
+  const [end, setend] = useState(false);
+  const [title, settitle] = useState("");
+  const [start_date, setstart_date] = useState(new Date());
+  // const [end_date, setend_date] = useState("");
+  const [start_time, setstart_time] = useState(new Date());
+  const [end_time, setend_time] = useState(new Date());
+  const [desc, setdesc] = useState("");
+  const [project, setproject] = useState("");
 
   useEffect(() => {
     navigation.setOptions({
@@ -69,7 +94,11 @@ const CreateTask = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
+  }, [navigation]);
+
+  const createTask = () => {
+    console.log({ project, title, start_date, start_time, end_time, desc });
+  };
 
   return (
     <ScrollView>
@@ -82,9 +111,13 @@ const CreateTask = () => {
               marginBottom: 10,
             }}
           >
-            Task Name
+            Task Name <Text style={{ color: "red" }}>*</Text>
           </Text>
-          <TextInput style={styles.inputName} placeholder="eg ui design" />
+          <TextInput
+            onChangeText={(text) => settitle(text)}
+            style={styles.inputName}
+            placeholder="eg ui design"
+          />
         </View>
         <Text
           style={{
@@ -94,18 +127,35 @@ const CreateTask = () => {
             width: "100%",
           }}
         >
-          Category
+          Project
         </Text>
         <SafeAreaView style={{ height: 50 }}>
           <FlatList
-            data={categories}
-            renderItem={({ item }) => <Category category={item} />}
-            keyExtractor={(item: string) => item}
+            data={projects}
+            renderItem={({ item }) => (
+              <Project
+                project={item}
+                selected={project}
+                setproject={setproject}
+              />
+            )}
+            keyExtractor={(item) => item.id}
             horizontal={true}
           />
         </SafeAreaView>
 
         <View style={styles.date_and_timeContainer}>
+          {select_date && (
+            <RNDateTimePicker
+              onChange={(event, date) => {
+                let newdate = date as Date;
+                setstart_date(newdate);
+                setselect_date(false);
+              }}
+              mode="date"
+              value={start_date}
+            />
+          )}
           <Text
             style={{
               fontSize: 20,
@@ -113,16 +163,27 @@ const CreateTask = () => {
               marginBottom: 10,
             }}
           >
-            Date & Time
+            Date & Time <Text style={{ color: "red" }}>*</Text>
           </Text>
           <View style={styles.date_container}>
-            <Text>05 april teusday</Text>
-            <TouchableOpacity>
+            <Text>{start_date.toDateString()}</Text>
+            <TouchableOpacity onPress={() => setselect_date((prev) => !prev)}>
               <SimpleLineIcons name="calendar" size={20} color="#3787eb" />
             </TouchableOpacity>
           </View>
           <View style={styles.end_and_startCont}>
             <View style={styles.time_containers}>
+              {start && (
+                <RNDateTimePicker
+                  onChange={(event, date) => {
+                    let newdate = date as Date;
+                    setstart_time(newdate);
+                    setstart(false);
+                  }}
+                  mode="time"
+                  value={start_time}
+                />
+              )}
               <Text
                 style={{
                   fontSize: 18,
@@ -130,17 +191,28 @@ const CreateTask = () => {
                   marginBottom: 10,
                 }}
               >
-                Start time
+                Start time <Text style={{ color: "red" }}>*</Text>
               </Text>
               <View style={styles.time}>
-                <Text>09:00 AM</Text>
-                <TouchableOpacity>
+                <Text>{start_time.toLocaleTimeString()}</Text>
+                <TouchableOpacity onPress={() => setstart((prev) => !prev)}>
                   <AntDesign name="down" size={20} color="#3787eb" />
                 </TouchableOpacity>
               </View>
             </View>
 
             <View style={styles.time_containers}>
+              {end && (
+                <RNDateTimePicker
+                  onChange={(event, date) => {
+                    let newdate = date as Date;
+                    setend_time(newdate);
+                    setend(false);
+                  }}
+                  mode="time"
+                  value={end_time}
+                />
+              )}
               <Text
                 style={{
                   fontSize: 18,
@@ -148,11 +220,11 @@ const CreateTask = () => {
                   marginBottom: 10,
                 }}
               >
-                End time
+                End time <Text style={{ color: "red" }}>*</Text>
               </Text>
               <View style={styles.time}>
-                <Text>11:00 AM </Text>
-                <TouchableOpacity>
+                <Text>{end_time.toLocaleTimeString()} </Text>
+                <TouchableOpacity onPress={() => setend((prev) => !prev)}>
                   <AntDesign name="down" size={20} color="#3787eb" />
                 </TouchableOpacity>
               </View>
@@ -168,16 +240,17 @@ const CreateTask = () => {
               marginBottom: 10,
             }}
           >
-            Description
+            Description <Text style={{ color: "red" }}>*</Text>
           </Text>
           <TextInput
             style={styles.inputDesc}
+            onChangeText={(text) => setdesc(text)}
             multiline
             numberOfLines={6}
-            placeholder="eg ui design"
+            placeholder="A short description about the project"
           />
         </View>
-        <TouchableOpacity style={styles.createTask}>
+        <TouchableOpacity onPress={createTask} style={styles.createTask}>
           <Text
             style={{
               color: "#ffffff",
@@ -213,7 +286,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     height: 50,
   },
-  categorybtn: {
+  projectbtn: {
     height: 40,
 
     marginLeft: 10,
