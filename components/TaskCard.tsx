@@ -1,10 +1,11 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { useRouter } from "expo-router";
+import { RelativePathString, useRouter } from "expo-router";
+import { taskType } from "@/types";
 
 type Props = {
-  item: { id: number; title: string; start_time: string; end_time: string };
+  item: taskType;
 };
 const TaskCard = ({ item }: Props) => {
   const route = useRouter();
@@ -22,14 +23,24 @@ const TaskCard = ({ item }: Props) => {
 
         <View style={styles.info}>
           <Text style={{ fontWeight: 400, fontSize: 15 }}>{item.title}</Text>
+
+          <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>
+            Start:
+            {new Date(item.start_date as string).toDateString()}
+          </Text>
           <Text style={{ color: "#9a9a9a" }}>
-            {" "}
-            {item.start_time} - {item.end_time}
+            {new Date(item.start_time as string).toLocaleTimeString()} -
+            {new Date(item.end_time as string).toLocaleTimeString()}
           </Text>
         </View>
       </View>
 
-      <TouchableOpacity onPress={() => route.push("/task/[id]")}>
+      <TouchableOpacity
+        onPress={() => {
+          const path = `/task/${item.id}` as RelativePathString;
+          route.push(path);
+        }}
+      >
         <SimpleLineIcons name="arrow-right" size={24} color="black" />
       </TouchableOpacity>
     </View>

@@ -1,10 +1,11 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { useRouter } from "expo-router";
+import { RelativePathString, useRouter } from "expo-router";
+import { projectType } from "@/types";
 
 type Props = {
-  item: { id: number; title: string; start_time: string; end_time: string };
+  item: projectType;
 };
 const ProjectCard = ({ item }: Props) => {
   const route = useRouter();
@@ -23,12 +24,18 @@ const ProjectCard = ({ item }: Props) => {
         <View style={styles.info}>
           <Text style={{ fontWeight: 400, fontSize: 15 }}>{item.title}</Text>
           <Text style={{ color: "#9a9a9a" }}>
-            {item.start_time} - {item.end_time}
+            {new Date(item?.start_date as string).toDateString()}
           </Text>
         </View>
       </View>
 
-      <TouchableOpacity onPress={() => route.push("/project/[id]")}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log(item.id);
+          let path = `/project/${item.id}` as RelativePathString;
+          route.push(path);
+        }}
+      >
         <SimpleLineIcons name="arrow-right" size={24} color="black" />
       </TouchableOpacity>
     </View>

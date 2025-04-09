@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { TaskCard } from "@/components";
@@ -19,12 +19,19 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { useAppContext } from "@/hooks/contexHook";
+import { useSearchParams } from "expo-router/build/hooks";
 
 const TaskDetails = () => {
   const navigation = useNavigation();
   const route = useRouter();
+  const taskId = useSearchParams().get("id");
+  const { getTaskbyid } = useAppContext();
+  const [task, settask] = useState<taskType>();
 
   useEffect(() => {
+    const data = getTaskbyid(taskId as string);
+    settask(data);
     navigation.setOptions({
       headerShown: true,
       title: "Task Details",
@@ -60,27 +67,33 @@ const TaskDetails = () => {
           marginBottom: 20,
         }}
       >
-        Web Development
+        {task?.title}
       </Text>
       <View style={styles.date_container}>
         <View style={styles.dateIcon}>
           <SimpleLineIcons name="calendar" size={20} color="#3787eb" />
         </View>
         <Text style={{ color: "#9a9a9a", fontWeight: 600 }}>
-          04 april , at 11:30 AM
+          {new Date(
+            task?.created_at || (new Date().toString() as string)
+          ).toDateString()}{" "}
+          , at{" "}
+          {new Date(
+            task?.created_at || (new Date().toString() as string)
+          ).toLocaleTimeString()}
         </Text>
       </View>
       <View style={styles.progressContainer}>
         <View style={styles.progressInfo}>
-          <Text style={{ fontWeight: 500 }}>In Progress</Text>
-          <Text style={{ fontWeight: 500 }}>40%</Text>
+          <Text style={{ fontWeight: 500 }}>{task?.status || "pending"}</Text>
+          <Text style={{ fontWeight: 500 }}>0%</Text>
         </View>
         <Progress.Bar
           borderWidth={0}
           unfilledColor="#ecf4fd"
           color="#3787eb"
           height={7}
-          progress={0.3}
+          progress={0}
           width={300}
         />
       </View>
@@ -105,21 +118,24 @@ const TaskDetails = () => {
           height: "auto",
         }}
       >
-        If you liked Tsukimichi: Moonlit Fantasy, you're probably into isekai
-        anime with a powerful MC, fantasy world-building, and some comedy. Heres
-        a list of anime similar in vibe, theme, or tone...
+        {task?.desc?.substring(0, 200)}
         <TouchableOpacity>
           <Text style={{ color: "#3787eb", fontWeight: 600 }}>Read More</Text>
         </TouchableOpacity>
       </Text>
 
       <View style={styles.tasksHeader}>
-        <TouchableOpacity style={styles.progressBtn}>
-          <Text>In Progress</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.completeBtn}>
-          <Text>Complete</Text>
-        </TouchableOpacity>
+        {task?.status === "pending" ||
+          (!task?.status && (
+            <TouchableOpacity style={styles.progressBtn}>
+              <Text>In Progress</Text>
+            </TouchableOpacity>
+          ))}
+        {task?.status !== "complete" && (
+          <TouchableOpacity style={styles.completeBtn}>
+            <Text>Complete</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity style={styles.actionIcons}>
           <Entypo name="edit" size={24} color="black" />

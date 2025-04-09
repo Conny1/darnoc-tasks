@@ -13,6 +13,7 @@ import { useNavigation, useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { useAppContext } from "@/hooks/contexHook";
 
 type projectProps = {
   project: { id: string; title: string };
@@ -69,6 +70,7 @@ const CreateTask = () => {
   const [end_time, setend_time] = useState(new Date());
   const [desc, setdesc] = useState("");
   const [project, setproject] = useState("");
+  const { createTask } = useAppContext();
 
   useEffect(() => {
     navigation.setOptions({
@@ -96,8 +98,21 @@ const CreateTask = () => {
     });
   }, [navigation]);
 
-  const createTask = () => {
+  const createHandler = async () => {
     console.log({ project, title, start_date, start_time, end_time, desc });
+    try {
+      const payload = {
+        title,
+        start_time: start_time.toString(),
+        end_time: end_time.toString(),
+        start_date: start_date.toString(),
+        desc,
+        project_id: project,
+      };
+      await createTask(payload);
+    } catch (error) {
+      console.log("failed to create task");
+    }
   };
 
   return (
@@ -250,7 +265,7 @@ const CreateTask = () => {
             placeholder="A short description about the project"
           />
         </View>
-        <TouchableOpacity onPress={createTask} style={styles.createTask}>
+        <TouchableOpacity onPress={createHandler} style={styles.createTask}>
           <Text
             style={{
               color: "#ffffff",

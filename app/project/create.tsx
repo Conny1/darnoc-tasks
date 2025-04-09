@@ -11,6 +11,7 @@ import { useNavigation, useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { useAppContext } from "@/hooks/contexHook";
 
 const CreateProject = () => {
   const navigation = useNavigation();
@@ -20,6 +21,7 @@ const CreateProject = () => {
   const [start_date, setstart_date] = useState(new Date());
   // const [end_date, setend_date] = useState("");
   const [desc, setdesc] = useState("");
+  const { createProject } = useAppContext();
 
   useEffect(() => {
     navigation.setOptions({
@@ -47,8 +49,19 @@ const CreateProject = () => {
     });
   }, [navigation]);
 
-  const createProject = () => {
-    console.log({ title, start_date, desc });
+  const createHandler = async () => {
+    // console.log({ title, start_date, desc });
+    try {
+      let payload = {
+        title,
+        start_date: start_date.toString(),
+        desc,
+        created_at: new Date().toString(),
+      };
+      await createProject(payload);
+    } catch (error) {
+      console.log("error createing project", error);
+    }
   };
 
   return (
@@ -119,7 +132,7 @@ const CreateProject = () => {
             placeholder="A short description about the project"
           />
         </View>
-        <TouchableOpacity onPress={createProject} style={styles.createProject}>
+        <TouchableOpacity onPress={createHandler} style={styles.createProject}>
           <Text
             style={{
               color: "#ffffff",

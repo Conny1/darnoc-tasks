@@ -6,16 +6,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { TaskCard } from "@/components";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { taskType } from "@/types";
+import { projectType, taskType } from "@/types";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from "react-native-progress";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import { useAppContext } from "@/hooks/contexHook";
+import { useSearchParams } from "expo-router/build/hooks";
 
 const tasks: taskType[] = [
   {
@@ -143,8 +145,13 @@ const tasks: taskType[] = [
 const ProjectDetails = () => {
   const navigation = useNavigation();
   const route = useRouter();
+  const projectId = useSearchParams().get("id");
+  const { getProjectbyid } = useAppContext();
+  const [project, setproject] = useState<projectType>();
 
   useEffect(() => {
+    const data = getProjectbyid(projectId as string);
+    setproject(data);
     navigation.setOptions({
       headerShown: true,
       title: "Project Details",
@@ -180,17 +187,17 @@ const ProjectDetails = () => {
           marginBottom: 20,
         }}
       >
-        Web Development
+        {project?.title}
       </Text>
       <View style={styles.date_container}>
         <View style={styles.dateIcon}>
           <SimpleLineIcons name="calendar" size={20} color="#3787eb" />
         </View>
         <Text style={{ color: "#9a9a9a", fontWeight: 600 }}>
-          04 april , at 11:30 AM
+          {new Date(project?.start_date as string).toDateString()}
         </Text>
       </View>
-      <View style={styles.progressContainer}>
+      {/* <View style={styles.progressContainer}>
         <View style={styles.progressInfo}>
           <Text style={{ fontWeight: 500 }}>In Progress</Text>
           <Text style={{ fontWeight: 500 }}>40%</Text>
@@ -203,7 +210,7 @@ const ProjectDetails = () => {
           progress={0.3}
           width={300}
         />
-      </View>
+      </View> */}
       <Text
         style={{
           fontSize: 20,
@@ -225,9 +232,7 @@ const ProjectDetails = () => {
           height: "auto",
         }}
       >
-        If you liked Tsukimichi: Moonlit Fantasy, you're probably into isekai
-        anime with a powerful MC, fantasy world-building, and some comedy. Heres
-        a list of anime similar in vibe, theme, or tone...
+        {project?.desc?.substring(0, 200)}
         <TouchableOpacity>
           <Text style={{ color: "#3787eb", fontWeight: 600 }}>Read More</Text>
         </TouchableOpacity>
