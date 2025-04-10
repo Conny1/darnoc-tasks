@@ -63,7 +63,7 @@ const TaskDetails = () => {
     let oldData = task;
     if (oldData) {
       for (let key in body) {
-        oldData[key as keyof taskType] = body[key];
+        oldData[key as keyof taskType] = body[key as keyof {}];
       }
 
       updateTask(oldData.id as string, oldData);
