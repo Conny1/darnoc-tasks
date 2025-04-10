@@ -2,6 +2,7 @@ import {
   Button,
   FlatList,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -26,8 +27,9 @@ const TaskDetails = () => {
   const navigation = useNavigation();
   const route = useRouter();
   const taskId = useSearchParams().get("id");
-  const { getTaskbyid } = useAppContext();
+  const { getTaskbyid, updateTask } = useAppContext();
   const [task, settask] = useState<taskType>();
+  const [read, setread] = useState(false);
 
   useEffect(() => {
     const data = getTaskbyid(taskId as string);
@@ -57,94 +59,147 @@ const TaskDetails = () => {
     });
   }, []);
 
+  const updateTaskHandler = (body: taskType) => {
+    let oldData = task;
+    if (oldData) {
+      for (let key in body) {
+        oldData[key as keyof taskType] = body[key];
+      }
+
+      updateTask(oldData.id as string, oldData);
+      console.log(oldData);
+      settask(oldData);
+    }
+  };
+
   return (
-    <View style={styles.main}>
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: 600,
-          width: "100%",
-          marginBottom: 20,
-        }}
-      >
-        {task?.title}
-      </Text>
-      <View style={styles.date_container}>
-        <View style={styles.dateIcon}>
-          <SimpleLineIcons name="calendar" size={20} color="#3787eb" />
-        </View>
-        <Text style={{ color: "#9a9a9a", fontWeight: 600 }}>
-          {new Date(
-            task?.created_at || (new Date().toString() as string)
-          ).toDateString()}{" "}
-          , at{" "}
-          {new Date(
-            task?.created_at || (new Date().toString() as string)
-          ).toLocaleTimeString()}
+    <ScrollView>
+      <View style={styles.main}>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 600,
+            width: "100%",
+            marginBottom: 20,
+          }}
+        >
+          {task?.title}
         </Text>
-      </View>
-      <View style={styles.progressContainer}>
-        <View style={styles.progressInfo}>
-          <Text style={{ fontWeight: 500 }}>{task?.status || "pending"}</Text>
-          <Text style={{ fontWeight: 500 }}>0%</Text>
+        <View style={styles.date_container}>
+          <View style={styles.dateIcon}>
+            <SimpleLineIcons name="calendar" size={20} color="#3787eb" />
+          </View>
+          <Text style={{ color: "#9a9a9a", fontWeight: 600 }}>
+            {new Date(
+              task?.created_at || (new Date().toString() as string)
+            ).toDateString()}{" "}
+            , at{" "}
+            {new Date(
+              task?.created_at || (new Date().toString() as string)
+            ).toLocaleTimeString()}
+          </Text>
         </View>
-        <Progress.Bar
-          borderWidth={0}
-          unfilledColor="#ecf4fd"
-          color="#3787eb"
-          height={7}
-          progress={0}
-          width={300}
-        />
-      </View>
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: 600,
-          width: "100%",
-          marginBottom: 20,
-        }}
-      >
-        Overview
-      </Text>
+        <View style={styles.progressContainer}>
+          <View style={styles.progressInfo}>
+            <Text style={{ fontWeight: 500 }}>{task?.status || "pending"}</Text>
+            <Text style={{ fontWeight: 500 }}>
+              {task?.status === "inprogress"
+                ? "50%"
+                : task?.status === "complete"
+                ? "100%"
+                : "0%"}{" "}
+            </Text>
+          </View>
+          <Progress.Bar
+            borderWidth={0}
+            unfilledColor="#ecf4fd"
+            color="#3787eb"
+            height={7}
+            progress={
+              task?.status === "inprogress"
+                ? 0.5
+                : task?.status === "complete"
+                ? 1
+                : 0
+            }
+            width={300}
+          />
+        </View>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 600,
+            width: "100%",
+            marginBottom: 20,
+          }}
+        >
+          Overview
+        </Text>
 
-      <Text
-        style={{
-          fontWeight: 600,
-          lineHeight: 20,
-          color: "#9a9a9a",
-          width: "100%",
-          marginBottom: 20,
-          height: "auto",
-        }}
-      >
-        {task?.desc?.substring(0, 200)}
-        <TouchableOpacity>
-          <Text style={{ color: "#3787eb", fontWeight: 600 }}>Read More</Text>
-        </TouchableOpacity>
-      </Text>
+        <Text
+          style={{
+            fontWeight: 600,
+            lineHeight: 20,
+            color: "#9a9a9a",
+            width: "100%",
+            marginBottom: 20,
+            height: "auto",
+          }}
+        >
+          {read ? (
+            <>
+              {task?.desc}
+              <TouchableOpacity onPress={() => setread(false)}>
+                <Text style={{ color: "#eb374f", fontWeight: 600 }}>
+                  Read less
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              {task?.desc?.substring(0, 200)}
+              <TouchableOpacity onPress={() => setread(true)}>
+                <Text style={{ color: "#3787eb", fontWeight: 600 }}>
+                  Read More
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Text>
 
-      <View style={styles.tasksHeader}>
-        {task?.status === "pending" ||
-          (!task?.status && (
-            <TouchableOpacity style={styles.progressBtn}>
-              <Text>In Progress</Text>
+        <View style={styles.tasksHeader}>
+          {task?.status === "pending" ||
+            (!task?.status && (
+              <TouchableOpacity
+                onPress={() => updateTaskHandler({ status: "inprogress" })}
+                style={styles.progressBtn}
+              >
+                <Text>In Progress</Text>
+              </TouchableOpacity>
+            ))}
+          {task?.status !== "complete" && (
+            <TouchableOpacity
+              onPress={() =>
+                updateTaskHandler({ status: "complete", is_done: true })
+              }
+              style={styles.completeBtn}
+            >
+              <Text>Complete</Text>
             </TouchableOpacity>
-          ))}
-        {task?.status !== "complete" && (
-          <TouchableOpacity style={styles.completeBtn}>
-            <Text>Complete</Text>
-          </TouchableOpacity>
-        )}
+          )}
 
-        <TouchableOpacity style={styles.actionIcons}>
-          <Entypo name="edit" size={24} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionIcons}>
-          <FontAwesome6 name="trash-can" size={24} color="black" />
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.actionIcons}>
+            <Entypo name="edit" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => updateTaskHandler({ is_deleted: true })}
+            style={styles.actionIcons}
+          >
+            <FontAwesome6 name="trash-can" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

@@ -1,10 +1,12 @@
 import {
+  Alert,
   FlatList,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -14,11 +16,12 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useAppContext } from "@/hooks/contexHook";
+import { projectType } from "@/types";
 
 type projectProps = {
-  project: { id: string; title: string };
-  setproject: React.Dispatch<React.SetStateAction<string>>;
-  selected: string;
+  project: projectType;
+  setproject: React.Dispatch<React.SetStateAction<string | undefined>>;
+  selected?: string;
 };
 const Project = ({ project, selected, setproject }: projectProps) => {
   const [active, setactive] = useState(false);
@@ -50,13 +53,6 @@ const Project = ({ project, selected, setproject }: projectProps) => {
   );
 };
 
-let projects = [
-  { id: "a", title: "Design" },
-  { id: "b", title: "development" },
-  { id: "c", title: "research" },
-  { id: "d", title: "Science" },
-];
-
 const CreateTask = () => {
   const navigation = useNavigation();
   const route = useRouter();
@@ -69,8 +65,8 @@ const CreateTask = () => {
   const [start_time, setstart_time] = useState(new Date());
   const [end_time, setend_time] = useState(new Date());
   const [desc, setdesc] = useState("");
-  const [project, setproject] = useState("");
-  const { createTask } = useAppContext();
+  const [project, setproject] = useState<string | undefined>();
+  const { createTask, projects } = useAppContext();
 
   useEffect(() => {
     navigation.setOptions({
@@ -99,7 +95,11 @@ const CreateTask = () => {
   }, [navigation]);
 
   const createHandler = async () => {
-    console.log({ project, title, start_date, start_time, end_time, desc });
+    // console.log({ project, title, start_date, start_time, end_time, desc });
+    if (!title || !start_date || !desc || !start_time || !end_time) {
+      Alert.alert("Alert", "Provide all required fields with *");
+      return;
+    }
     try {
       const payload = {
         title,
@@ -110,7 +110,13 @@ const CreateTask = () => {
         project_id: project,
       };
       await createTask(payload);
+      ToastAndroid.show("New task created", 3);
+      setdesc("");
+      settitle("");
+      setproject("");
     } catch (error) {
+      ToastAndroid.show("Encounterd an error creating task.Try again", 5);
+
       console.log("failed to create task");
     }
   };
@@ -132,6 +138,7 @@ const CreateTask = () => {
             onChangeText={(text) => settitle(text)}
             style={styles.inputName}
             placeholder="eg ui design"
+            value={title}
           />
         </View>
         <Text
@@ -154,7 +161,7 @@ const CreateTask = () => {
                 setproject={setproject}
               />
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item?.id as string}
             horizontal={true}
           />
         </SafeAreaView>
@@ -261,8 +268,9 @@ const CreateTask = () => {
             style={styles.inputDesc}
             onChangeText={(text) => setdesc(text)}
             multiline
-            numberOfLines={6}
-            placeholder="A short description about the project"
+            numberOfLines={15}
+            placeholder="A short description about the task"
+            value={desc}
           />
         </View>
         <TouchableOpacity onPress={createHandler} style={styles.createTask}>

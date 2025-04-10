@@ -1,8 +1,10 @@
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -51,6 +53,11 @@ const CreateProject = () => {
 
   const createHandler = async () => {
     // console.log({ title, start_date, desc });
+    if (!title || !start_date || !desc) {
+      Alert.alert("Alert", "Provide all required fields with *");
+
+      return;
+    }
     try {
       let payload = {
         title,
@@ -59,7 +66,11 @@ const CreateProject = () => {
         created_at: new Date().toString(),
       };
       await createProject(payload);
+      ToastAndroid.show("New project created", 3);
+      setdesc("");
+      settitle("");
     } catch (error) {
+      ToastAndroid.show("Encounterd an error creating project.Try again", 5);
       console.log("error createing project", error);
     }
   };
@@ -81,6 +92,7 @@ const CreateProject = () => {
             onChangeText={(text) => settitle(text)}
             style={styles.inputName}
             placeholder="eg CRM Mock"
+            value={title}
           />
         </View>
 
@@ -128,8 +140,9 @@ const CreateProject = () => {
             onChangeText={(text) => setdesc(text)}
             style={styles.inputDesc}
             multiline
-            numberOfLines={6}
+            numberOfLines={15}
             placeholder="A short description about the project"
+            value={desc}
           />
         </View>
         <TouchableOpacity onPress={createHandler} style={styles.createProject}>

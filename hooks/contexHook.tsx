@@ -24,6 +24,9 @@ type createContextType = {
   deleteProject: (projectId: string) => Promise<void>;
   getProjectbyid: (projectId: string) => projectType | undefined;
   getTaskbyid: (taskId: string) => taskType | undefined;
+  getCurrentDayTasks: () => taskType[];
+  getTasksByDate: (date: string) => taskType[];
+  getTasksByprojectid: (id: string) => taskType[];
 };
 
 // Create the context
@@ -108,6 +111,28 @@ export function AppProvider({ children }: childrenPropstype) {
   const getTaskbyid = (taskId: string) => {
     return tasks.find((item) => item.id === taskId);
   };
+  // get current Day tasks
+  const getCurrentDayTasks = () => {
+    const currentDate = new Date().toLocaleDateString();
+    return tasks.filter(
+      (item) =>
+        currentDate === new Date(item.start_date as string).toLocaleDateString()
+    );
+  };
+
+  // get current Day tasks
+  const getTasksByDate = (date: string) => {
+    const currentDate = new Date(date).toLocaleDateString();
+    return tasks.filter(
+      (item) =>
+        currentDate === new Date(item.start_date as string).toLocaleDateString()
+    );
+  };
+
+  // get tasks by project id
+  const getTasksByprojectid = (id: string) => {
+    return tasks.filter((item) => id === item.project_id);
+  };
 
   // Update task
   const updateTask = async (taskId: string, updatedTask: taskType) => {
@@ -153,6 +178,9 @@ export function AppProvider({ children }: childrenPropstype) {
         deleteProject,
         getProjectbyid,
         getTaskbyid,
+        getCurrentDayTasks,
+        getTasksByDate,
+        getTasksByprojectid,
       }}
     >
       {children}

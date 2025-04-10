@@ -11,7 +11,7 @@ export type taskType = {
   is_deleted?: boolean;
   due_date?: string;
   created_at?: string;
-  status?: string;
+  status?: "pending" | "complete" | "inprogress";
 };
 
 export type projectType = {

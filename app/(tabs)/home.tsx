@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { TaskCard } from "@/components";
@@ -19,9 +19,31 @@ import { useAppContext } from "@/hooks/contexHook";
 const Home = () => {
   const navigation = useNavigation();
   const route = useRouter();
-  const { tasks } = useAppContext();
+  const { tasks: alltasks, getCurrentDayTasks } = useAppContext();
+  const [tasks, settasks] = useState<taskType[]>([]);
+  const [progress, setprogress] = useState(0);
+
+  const todaysTasks = () => {
+    const data = getCurrentDayTasks();
+
+    settasks(data);
+
+    if (data.length !== 0) {
+      const totalTasks = data.length;
+      const completedTasks = data.filter(
+        (item) => item.status === "complete"
+      ).length;
+
+      const progressPercentage = completedTasks / totalTasks; // value between 0 and 1
+
+      setprogress(progressPercentage);
+    } else {
+      setprogress(0); // or handle no tasks case
+    }
+  };
 
   useEffect(() => {
+    todaysTasks();
     navigation.setOptions({
       headerShown: true,
       title: "Homepage",
@@ -48,7 +70,7 @@ const Home = () => {
         </TouchableOpacity>
       ),
     });
-  }, []);
+  }, [alltasks]);
 
   return (
     <View style={styles.main}>
@@ -63,19 +85,19 @@ const Home = () => {
         />
         <View>
           <Text style={{ color: "#ffffff" }}>Today's progress summery</Text>
-          <Text style={{ color: "#ffffff" }}>15 Tasks</Text>
+          <Text style={{ color: "#ffffff" }}>{tasks?.length || 0} Tasks</Text>
         </View>
         <View style={styles.progressContainer}>
           <View style={styles.progressInfo}>
             <Text style={{ color: "#ffffff" }}>Progress</Text>
-            <Text style={{ color: "#ffffff" }}>40%</Text>
+            <Text style={{ color: "#ffffff" }}>{progress * 100}%</Text>
           </View>
           <Progress.Bar
             borderWidth={0}
             unfilledColor="#7cb1e4"
             color="#ffffff"
             height={10}
-            progress={0.3}
+            progress={progress}
             width={200}
           />
         </View>
@@ -88,16 +110,21 @@ const Home = () => {
           <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>See All</Text>
         </TouchableOpacity>
       </View>
-
-      <SafeAreaProvider style={styles.providerContainer}>
-        <SafeAreaView style={styles.listContainer}>
-          <FlatList
-            data={tasks}
-            renderItem={({ item }) => <TaskCard item={item} />}
-            keyExtractor={(item) => item.id as unknown as string}
-          />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      {tasks.length === 0 ? (
+        <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>
+          No tasks for you today 😊
+        </Text>
+      ) : (
+        <SafeAreaProvider style={styles.providerContainer}>
+          <SafeAreaView style={styles.listContainer}>
+            <FlatList
+              data={tasks}
+              renderItem={({ item }) => <TaskCard item={item} />}
+              keyExtractor={(item) => item.id as unknown as string}
+            />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      )}
     </View>
   );
 };
