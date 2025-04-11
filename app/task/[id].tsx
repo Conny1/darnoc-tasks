@@ -1,6 +1,7 @@
 import {
   Button,
   FlatList,
+  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -9,9 +10,9 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useNavigation, useRouter } from "expo-router";
+import { RelativePathString, useNavigation, useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { TaskCard } from "@/components";
+import { TaskCard, UpdateTask } from "@/components";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { taskType } from "@/types";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,6 +31,7 @@ const TaskDetails = () => {
   const { getTaskbyid, updateTask } = useAppContext();
   const [task, settask] = useState<taskType>();
   const [read, setread] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const data = getTaskbyid(taskId as string);
@@ -67,8 +69,11 @@ const TaskDetails = () => {
       }
 
       updateTask(oldData.id as string, oldData);
-      console.log(oldData);
+
       settask(oldData);
+      if (body.is_deleted === true) {
+        route.back();
+      }
     }
   };
 
@@ -188,7 +193,12 @@ const TaskDetails = () => {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity style={styles.actionIcons}>
+          <TouchableOpacity
+            onPress={() => {
+              setModalVisible(!modalVisible);
+            }}
+            style={styles.actionIcons}
+          >
             <Entypo name="edit" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
@@ -199,6 +209,17 @@ const TaskDetails = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <UpdateTask task={task} setModalVisible={setModalVisible} />
+      </Modal>
     </ScrollView>
   );
 };

@@ -1,5 +1,6 @@
 import {
   FlatList,
+  Modal,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -9,7 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { TaskCard } from "@/components";
+import { TaskCard, UpdateProject } from "@/components";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { projectType, taskType } from "@/types";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +19,8 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { useAppContext } from "@/hooks/contexHook";
 import { useSearchParams } from "expo-router/build/hooks";
+import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const ProjectDetails = () => {
   const navigation = useNavigation();
@@ -27,9 +30,11 @@ const ProjectDetails = () => {
     getProjectbyid,
     tasks: allTasks,
     getTasksByprojectid,
+    updateProject,
   } = useAppContext();
   const [project, setproject] = useState<projectType>();
   const [tasks, settasks] = useState<taskType[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchTasks = () => {
     const data = getProjectbyid(projectId as string);
@@ -64,6 +69,22 @@ const ProjectDetails = () => {
       ),
     });
   }, [allTasks]);
+
+  const updateProjectHandler = (body: taskType) => {
+    let oldData = project;
+    if (oldData) {
+      for (let key in body) {
+        oldData[key as keyof projectType] = body[key as keyof {}];
+      }
+
+      updateProject(oldData.id as string, oldData);
+
+      setproject(oldData);
+      if (body.is_deleted === true) {
+        route.back();
+      }
+    }
+  };
 
   return (
     <View style={styles.main}>
@@ -125,6 +146,22 @@ const ProjectDetails = () => {
           <Text style={{ color: "#3787eb", fontWeight: 600 }}>Read More</Text>
         </TouchableOpacity>
       </Text>
+      <View style={styles.actionContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            setModalVisible(!modalVisible);
+          }}
+          style={styles.actionIcons}
+        >
+          <Entypo name="edit" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => updateProjectHandler({ is_deleted: true })}
+          style={styles.actionIcons}
+        >
+          <FontAwesome6 name="trash-can" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.tasksHeader}>
         <Text style={{ fontSize: 20, fontWeight: 600 }}> Tasks</Text>
@@ -133,16 +170,25 @@ const ProjectDetails = () => {
           <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>See All</Text>
         </TouchableOpacity>
       </View>
+      {tasks.length === 0 ? (
+        <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>
+          No tasks here 😊
+        </Text>
+      ) : (
+        <SafeAreaProvider style={styles.providerContainer}>
+          <SafeAreaView style={styles.listContainer}>
+            <FlatList
+              data={tasks}
+              renderItem={({ item }) => <TaskCard item={item} />}
+              keyExtractor={(item) => item.id as unknown as string}
+            />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      )}
 
-      <SafeAreaProvider style={styles.providerContainer}>
-        <SafeAreaView style={styles.listContainer}>
-          <FlatList
-            data={tasks}
-            renderItem={({ item }) => <TaskCard item={item} />}
-            keyExtractor={(item) => item.id as unknown as string}
-          />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <UpdateProject project={project} setModalVisible={setModalVisible} />
+      </Modal>
     </View>
   );
 };
@@ -155,6 +201,16 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
     alignItems: "center",
+  },
+  actionIcons: {
+    backgroundColor: "#ecf4fd",
+    padding: 10,
+    borderRadius: 30,
+  },
+  actionContainer: {
+    flexDirection: "row",
+    width: "100%",
+    gap: 10,
   },
 
   date_container: {

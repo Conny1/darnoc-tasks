@@ -2,6 +2,7 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -47,15 +48,21 @@ const Projects = () => {
 
   return (
     <View style={styles.main}>
-      <SafeAreaProvider style={styles.providerContainer}>
-        <SafeAreaView style={styles.listContainer}>
-          <FlatList
-            data={projects}
-            renderItem={({ item }) => <ProjectCard item={item} />}
-            keyExtractor={(item) => item.id as unknown as string}
-          />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      {projects.length === 0 ? (
+        <Text style={{ color: "#9a9a9a", fontWeight: 500 }}>
+          No projects here 😊
+        </Text>
+      ) : (
+        <SafeAreaProvider style={styles.providerContainer}>
+          <SafeAreaView style={styles.listContainer}>
+            <FlatList
+              data={projects}
+              renderItem={({ item }) => <ProjectCard item={item} />}
+              keyExtractor={(item) => item.id as unknown as string}
+            />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      )}
     </View>
   );
 };

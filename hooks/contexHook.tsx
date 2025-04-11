@@ -48,11 +48,19 @@ export function AppProvider({ children }: childrenPropstype) {
       const storedTasks = await Storage.getItem("tasks");
 
       if (storedProjects) {
-        setprojects(JSON.parse(storedProjects)); // Parse the stringified JSON data
+        const data = JSON.parse(storedProjects).filter(
+          (item: projectType) => item.is_deleted === false
+        );
+        setprojects(data); // Parse the stringified JSON data
       }
 
       if (storedTasks) {
-        settasks(JSON.parse(storedTasks));
+        console.log("data");
+        const data = JSON.parse(storedTasks).filter(
+          (item: taskType) => item.is_deleted === false
+        );
+
+        settasks(data);
       }
     };
 
@@ -97,10 +105,10 @@ export function AppProvider({ children }: childrenPropstype) {
     const updatedProjects = projects.map((project) =>
       project.id === projectId ? updatedProject : project
     );
-    setprojects(updatedProjects);
 
     // Save updated projects to key-value store
     await Storage.setItem("projects", JSON.stringify(updatedProjects));
+    setprojects(updatedProjects.filter((item) => item.is_deleted === false));
   };
   // get project by id
   const getProjectbyid = (projectId: string) => {
@@ -139,10 +147,10 @@ export function AppProvider({ children }: childrenPropstype) {
     const updatedTasks = tasks.map((task) =>
       task.id === taskId ? updatedTask : task
     );
-    settasks(updatedTasks);
 
     // Save updated tasks to key-value store
     await Storage.setItem("tasks", JSON.stringify(updatedTasks));
+    settasks(updatedTasks.filter((item) => item.is_deleted === false));
   };
 
   // Soft delete project
