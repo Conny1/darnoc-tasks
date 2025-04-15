@@ -1,6 +1,7 @@
 import Storage from "expo-sqlite/kv-store";
 import { projectType, taskType } from "@/types";
 import uuid from "react-native-uuid";
+import * as Notifications from "expo-notifications";
 
 import {
   createContext,
@@ -27,6 +28,8 @@ type createContextType = {
   getCurrentDayTasks: () => taskType[];
   getTasksByDate: (date: string) => taskType[];
   getTasksByprojectid: (id: string) => taskType[];
+  scheduleTaskReminder: (task: taskType) => Promise<void>;
+  cancelNotification: (notificationId: string) => Promise<void>;
 };
 
 // Create the context
@@ -92,6 +95,7 @@ export function AppProvider({ children }: childrenPropstype) {
     newTask["created_at"] = new Date().toString();
     const newTasks = [...tasks, newTask];
     settasks(newTasks);
+    scheduleTaskReminder(newTask);
 
     // Save updated tasks to key-value store
     await Storage.setItem("tasks", JSON.stringify(newTasks));
@@ -173,6 +177,47 @@ export function AppProvider({ children }: childrenPropstype) {
     await Storage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
+  const scheduleTaskReminder = async (task: taskType) => {
+    const datePart = new Date(task.start_date as string); // full Date object, use only Y/M/D
+    const timePart = new Date(task.start_time as string); // full Date object, use only H/M/S
+
+    const combinedDateTime = new Date(
+      datePart.getFullYear(),
+      datePart.getMonth(),
+      datePart.getDate(),
+      timePart.getHours(),
+      timePart.getMinutes(),
+      timePart.getSeconds()
+    );
+
+    const schedulingOptions = {
+      content: {
+        title: `⏰ Task Reminder`,
+        body: `Don't forget to start: "${task.title}"`,
+        data: { taskId: task.id },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: combinedDateTime,
+      }, // Fires at this exact combined datetime
+    };
+
+    try {
+      const notificationId = await Notifications.scheduleNotificationAsync(
+        schedulingOptions as any
+      );
+      console.log("Notification scheduled with ID:", notificationId);
+
+      // Save ID if needed for cancel/reschedule
+    } catch (error) {
+      console.error("Error scheduling notification:", error);
+    }
+  };
+
+  const cancelNotification = async (notificationId: string) => {
+    await Notifications.cancelScheduledNotificationAsync(notificationId);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -189,6 +234,8 @@ export function AppProvider({ children }: childrenPropstype) {
         getCurrentDayTasks,
         getTasksByDate,
         getTasksByprojectid,
+        scheduleTaskReminder,
+        cancelNotification,
       }}
     >
       {children}
