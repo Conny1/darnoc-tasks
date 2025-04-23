@@ -53,22 +53,22 @@ const Home = () => {
         // fontSize: 25,
         color: "#000022",
       },
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            padding: 10,
-            backgroundColor: "#f1f1f1",
-            borderRadius: 10,
-            marginRight: 10,
-          }}
-        >
-          <MaterialCommunityIcons
-            name="bell-outline"
-            size={24}
-            color="#9a9a9a"
-          />
-        </TouchableOpacity>
-      ),
+      // headerRight: () => (
+      //   <TouchableOpacity
+      //     style={{
+      //       padding: 10,
+      //       backgroundColor: "#f1f1f1",
+      //       borderRadius: 10,
+      //       marginRight: 10,
+      //     }}
+      //   >
+      //     <MaterialCommunityIcons
+      //       name="bell-outline"
+      //       size={24}
+      //       color="#9a9a9a"
+      //     />
+      //   </TouchableOpacity>
+      // ),
     });
   }, [alltasks]);
 

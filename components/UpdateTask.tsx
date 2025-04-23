@@ -117,9 +117,6 @@ const UpdateTask = ({ task, setModalVisible }: Props) => {
             // padding: 10,
             backgroundColor: "#f1f1f1",
             borderRadius: 10,
-            marginRight: 10,
-            position: "absolute",
-            right: 0,
           }}
         >
           <AntDesign name="close" size={40} color="black" />
